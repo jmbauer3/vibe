@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John M. Bauer | Between Detritus and Sacred</title>
+    <style>
+        /* Base Styles */
+        :root {
+            --primary-color: #6a0dad; /* Deep purple */
+            --secondary-color: #39ff14; /* Neon green */
+            --accent-color: #d4af37; /* Muted gold */
+            --dark-bg: #121212;
+            --text-color: #ffffff;
+            --font-main: 'Courier New', monospace;
+            --font-pixel: 'Press Start 2P', 'Courier New', monospace;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+        }
+        
+        /* Background Pattern - YTMND-inspired diagonal stripes */
+        .background-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(
+                45deg,
+                rgba(106, 13, 173, 0.1),
+                rgba(106, 13, 173, 0.1) 10px,
+                rgba(18, 18, 18, 0.2) 10px,
+                rgba(18, 18, 18, 0.2) 20px
+            );
+            z-index: 1;
+        }
+        
+        /* Particle Container */
+        .particle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        /* Main Content Container */
+        .content-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* Author Name */
+        .author-name {
+            font-size: 5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: var(--secondary-color);
+            text-shadow: 4px 4px 0px var(--primary-color);
+            margin-bottom: 10px;
+            animation: pulse 3s infinite;
+            letter-spacing: -2px;
+        }
+        
+        /* Author Tagline */
+        .author-tagline {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            color: var(--accent-color);
+            font-style: italic;
+            max-width: 80%;
+            animation: fadeInOut 8s infinite;
+        }
+        
+        /* Book Container */
+        .book-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            max-width: 800px;
+        }
+        
+        /* Book Item */
+        .book-item {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 3px solid var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .book-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--secondary-color);
+        }
+        
+        .book-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            z-index: 2;
+        }
+        
+        .book-description {
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            padding: 0 10px;
+            z-index: 2;
+        }
+        
+        .book-item:hover .book-description {
+            opacity: 1;
+        }
+        
+        /* Book Background Effects */
+        .book-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+        
+        .book-item:hover .book-bg {
+            opacity: 0.6;
+        }
+        
+        /* Floating Text */
+        .floating-text-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+        }
+        
+        .floating-text {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1rem;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        /* Social Links */
+        .social-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        
+        .social-link:hover {
+            transform: translateY(-5px);
+            background-color: var(--secondary-color);
+            color: var(--dark-bg);
+        }
+        
+        /* Audio Control */
+        .audio-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        /* Glitch Effect Overlay */
+        .glitch-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                rgba(255, 0, 0, 0.1),
+                rgba(0, 0, 255, 0.1)
+            );
+            mix-blend-mode: screen;
+            pointer-events: none;
+            z-index: 20;
+            opacity: 0.3;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(-5px, -5px); }
+            60% { transform: translate(5px, 5px); }
+            80% { transform: translate(5px, -5px); }
+            100% { transform: translate(0); }
+        }
+        
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .author-name {
+                font-size: 3rem;
+            }
+            
+            .author-tagline {
+                font-size: 1.2rem;
+            }
+            
+            .book-container {
+                gap: 10px;
+            }
+            
+            .book-item {
+                width: 120px;
+                height: 120px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .author-name {
+                font-size: 2rem;
+            }
+            
+            .author-tagline {
+                font-size: 1rem;
+            }
+            
+            .book-item {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .book-title {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Pattern -->
+    <div class="background-pattern"></div>
+    
+    <!-- Particle Container (will be populated by JS) -->
+    <div class="particle-container" id="particles"></div>
+    
+    <!-- Glitch Effect Overlay -->
+    <div class="glitch-overlay"></div>
+    
+    <!-- Main Content Container -->
+    <div class="content-container">
+        <h1 class="author-name">John M. Bauer</h1>
+        <p class="author-tagline">Between pop culture detritus and sacred text</p>
+        
+        <!-- Book Container -->
+        <div class="book-container">
+            <!-- Rhean -->
+            <div class="book-item" data-book="rhean">
+                <div class="book-bg" id="rhean-bg"></div>
+                <h3 class="book-title">Rhean</h3>
+                <p class="book-description">An immortal's journey through memory and regret</p>
+            </div>
+            
+            <!-- Maneus -->
+            <div class="book-item" data-book="maneus">
+                <div class="book-bg" id="maneus-bg"></div>
+                <h3 class="book-title">Maneus</h3>
+                <p class="book-description">Fragments of lives bound by generational fate</p>
+            </div>
+            
+            <!-- Besnowed -->
+            <div class="book-item" data-book="besnowed">
+                <div class="book-bg" id="besnowed-bg"></div>
+                <h3 class="book-title">Besnowed</h3>
+                <p class="book-description">Finding warmth in winter's embrace</p>
+            </div>
+            
+            <!-- Revification -->
+            <div class="book-item" data-book="revification">
+                <div class="book-bg" id="revification-bg"></div>
+                <h3 class="book-title">Revification</h3>
+                <p class="book-description">Reality bends in the mind's eye</p>
+            </div>
+            
+            <!-- Lux Aeterna -->
+            <div class="book-item" data-book="luxaeterna">
+                <div class="book-bg" id="luxaeterna-bg"></div>
+                <h3 class="book-title">Lux Aeterna</h3>
+                <p class="book-description">Divine rebellion in mundane spaces</p>
+            </div>
+        </div>
+        
+        <!-- Social Links -->
+        <div class="social-links">
+            <a href="https://johnbauer.substack.com/" class="social-link" target="_blank">S</a>
+            <a href="https://www.tiktok.com/@mobiuscoffee" class="social-link" target="_blank">T</a>
+            <a href="https://www.amazon.fr/stores/John-Michael-Bauer/author/B0C59Q3PZX" class="social-link" target="_blank">A</a>
+        </div>
+    </div>
+    
+    <!-- Floating Text Container (will be populated by JS) -->
+    <div class="floating-text-container" id="floating-text"></div>
+    
+    <!-- Audio Control -->
+    <div class="audio-control" id="audio-control">
+        <span id="audio-icon">♪</span>
+    </div>
+    
+    <!-- Audio Element (Base64 encoded for GitHub Pages) -->
+    <audio id="background-audio" loop>
+        <source src="data:audio/wav;base64,UklGRiQMAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAMAADDAMEAvgC7ALgAtQCyAK8ArACpAKYAowCgAJ0AmgCXAJQAkQCOAIsAiACFAIIAfwB8AHkAdgBzAHAAbQBqAGcAZABhAF4AWwBYAFUAUgBPAEwASQBGAEMAPwA8ADkANgAzADAALQAqACcAJAAhAB4AGwAYABUAEgAPAAwACQAGAAMAAAD9//r/9//0//H/7v/r/+j/5f/i/9//3P/Z/9b/0//Q/83/yv/H/8T/wf++/7v/uP+1/7L/r/+s/6n/pv+j/6D/nf+a/5f/lP+R/47/i/+I/4X/gv9//3z/ef92/3P/cP9t/2r/Z/9k/2H/Xv9b/1j/Vf9S/0//TP9J/0b/Q/9A/z3/Ov83/zT/Mf8u/yv/KP8l/yL/H/8c/xn/Fv8T/xD/Df8K/wf/BP8B//7++/74/vX+8v7v/uz+6f7m/uP+4P7d/tr+1/7U/tH+zv7L/sj+xf7C/r/+vP65/rb+s/6w/q3+qv6n/qT+of6e/pv+mP6V/pL+j/6M/on+hv6D/oD+ff56/nf+dP5x/m7+a/5o/mX+Yv5f/lz+Wf5W/lP+UP5N/kr+R/5E/kH+Pv47/jj+Nf4y/i/+LP4p/ib+I/4g/h3+Gv4X/hT+Ef4O/gv+CP4F/gL+//3+/P35/fb98/3w/e394P3d/dr91/3U/dH9zv3L/cj9xf3C/b/9vP25/bb9s/2w/a39qv2n/aT9of2e/Zv9mP2V/ZL9j/2M/Yn9hv2D/YD9ff16/Xf9dP1x/W79a/1o/WX9Yv1f/Vz9Wf1W/VP9UP1N/Ur9R/1E/UH9Pv07/Tj9Nf0y/S/9LP0p/Sb9I/0g/R39Gv0X/RT9Ef0O/Qv9CP0F/QL9//z++/z4/PX88vzv/Oz86fzm/OP84Pzd/Nr81/zU/NH8zvzL/Mj8xfzC/L/8vPy5/Lb8s/yw/K38qvyn/KT8ofye/Jv8mPyV/JL8j/yM/In8hvyD/ID8ffx6/Hf8dPxx/G78a/xo/GX8YvxfAMMAzADVAN4A5wDwAPkAAgELARQBHQEmAS8BOAFBAUoBUwFcAWUBbgF3AYABiQGSAZsBpAGtAbYBvwHIAdEB2gHjAewB9QH+AQcCEAIZAiICKwI0Aj0CRgJPAlgCYQJqAnMCfAKFAo4ClwKgAqkCsgK7AsQCzQLWAt8C6ALxAvoCAQMKAxMDHAMlAy4DNwNAA0kDUgNbA2QDbQN2A38DiAORA5oDowOsA7UDvgPHA9AD2QPiA+sD9AP9AwYEDwQYBCEEKgQzBDwERQROBFcEYARpBHIEewSEBI0ElgSfBKgEsQS6BMMEzATVBN4E5wTwBPkEAgULBRQFHQUmBS8FOAVBBUoFUwVcBWUFbgV3BYAFiQWSBZsFpAWtBbYFvwXIBdEF2gXjBewF9QX+BQcGEAYZBiIGKwY0Bj0GRgZPBlgGYQZqBnMGfAaFBo4GlwaQBpkGogZrBnQGfQaGBo8GmAahBqoGswa8BsUGzgbXBuAG6QbyBvsGBAcNBxYHHwcoBzEHOgdDB0wHVQdeB2cHcAd5B4IHiweUB50HpgetB7YHvwfIB9EH2gfjB+wH9Qf+Bw0IFgQfCCgIMQg6CEMITAhVCF4IZwhwCHkIggiLCJQInQimCK8IuAjBCMoI0wjcCOUI7gj3CAAJCQkSCRsJJAktCTYJPwlICVEJWglkCW0JdgmACYkJkgmbCaQJrQm2Cb8JyAnRCdoJ4wnsCfUJ/gkHChAKGQoiCisKNAo9CkYKTwpYCmEKagpzCnwKhQqOCpcKoAqpCrIKuwrECs0K1grfCugK8Qr6CgMLDAoVCh4KJwowCjkKQgpLClQKXQpmCm8KeAqBCooKkwqcCqUKrgq3CsAKyQrSCtsK5ArtCvYK/woIDREKGgojCiwKNQo+CkcKUApZCmIKawp0Cn0KhgqPCpgKoQqqCrMKvArFCs4K1wreAucK8Ar5CgILCwsUCx0LJgsvCzgLQQtKC1MLXAtkC20LdguAC4kLkguaC6MLrAu1C74LxwvQC9kL4gvrC/QL/QsGDA8MGAwgDCkMMgw7DEQMTQxWDF8MaAxwDHkMggwLDRQNHQ0mDS8NOA1BDUoNUw1cDWUNbg13DYANiQ2SDZsNpA2tDbYNvw3IDdEN2g3jDewN9Q3+DQcOEA4ZDiIOKw40Dj0ORg5PDlgOYQ5qDnMOfA6FDo4Olw6gDqkOsg67DsQOzQ7WDt8O6A7xDvoOAw8MDxUPHg8nDzAPOQ9CD0sPVA9dD2YPbw94D4EPig+TD5wPpQ+uD7cPwA/JD9IP2w/kD+0P9g//DwgQERAaECMQLBBVEF4QZxBwEHkQghCLEJQQnRCmEK8QuBC/EMgQ0RDaEOMQ7BD1EP4QBxEQERkRIhErETQRPRFGEU8RWBFhEWoRcxF8EYURjhGXEaARqRGyEbsRxBHNEdYR3xHoEfER+hEDEgwSFRIeEicSMBI5EkISSwJUEl0SZhJvEngSgRKKEpMSnBKlEq4StxLAEskS0hLbEuQS7RL2Ev8SCBMREyATKRMyEzsTRBNNE1YTXxNoE3ETehODE4wTlROeE6cTsBM=" type="audio/wav">
+    </audio>
+    
+    <script>
+        // Wait for DOM to load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Book background effects
+            setupBookBackgrounds();
+            
+            // Particle system
+            createParticles();
+            
+            // Floating text
+            createFloatingText();
+            
+            // Audio control
+            setupAudio();
+            
+            // Mouse movement effects
+            setupMouseEffects();
+        });
+        
+        // Book background effects
+        function setupBookBackgrounds() {
+            // Rhean - Fantasy-inspired background
+            const rheanBg = document.getElementById('rhean-bg');
+            rheanBg.style.background = 'radial-gradient(circle, rgba(106, 13, 173, 0.5) 0%, rgba(18, 18, 18, 0.8) 100%)';
+            
+            // Maneus - Fragmented background
+            const maneusBg = document.getElementById('maneus-bg');
+            maneusBg.style.background = 'linear-gradient(45deg, rgba(106, 13, 173, 0.3) 25%, transparent 25%, transparent 50%, rgba(106, 13, 173, 0.3) 50%, rgba(106, 13, 173, 0.3) 75%, transparent 75%, transparent)';
+            maneusBg.style.backgroundSize = '20px 20px';
+            
+            // Besnowed - Winter-themed background
+            const besnowedBg = document.getElementById('besnowed-bg');
+            besnowedBg.style.background = 'radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, rgba(173, 216, 230, 0.3) 100%)';
+            
+            // Revification - Glitchy background
+            const revificationBg = document.getElementById('revification-bg');
+            revificationBg.style.background = 'linear-gradient(90deg, rgba(57, 255, 20, 0.3) 0%, rgba(106, 13, 173, 0.3) 100%)';
+            
+            // Lux Aeterna - Office/mystical background
+            const luxaeternaBg = document.getElementById('luxaeterna-bg');
+            luxaeternaBg.style.background = 'repeating-linear-gradient(0deg, rgba(212, 175, 55, 0.2) 0px, rgba(212, 175, 55, 0.2) 1px, transparent 1px, transparent 10px)';
+            
+            // Add click events to books
+            const bookItems = document.querySelectorAll('.book-item');
+            bookItems.forEach(book => {
+                book.addEventListener('click', function() {
+                    const bookName = this.getAttribute('data-book');
+                    triggerBookEffect(bookName);
+                });
+            });
+        }
+        
+        // Trigger special effect when a book is clicked
+        function triggerBookEffect(bookName) {
+            const container = document.querySelector('.content-container');
+            
+            // Remove any existing effect classes
+            container.classList.remove('effect-rhean', 'effect-maneus', 'effect-besnowed', 'effect-revification', 'effect-luxaeterna');
+            
+            // Add the new effect class
+            container.classList.add(`effect-${bookName}`);
+            
+            // Create a temporary overlay effect
+            const overlay = document.createElement('div');
+            overlay.classList.add('temp-overlay');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            overlay.style.zIndex = '50';
+            overlay.style.pointerEvents = 'none';
+            document.body.appendChild(overlay);
+            
+            // Remove the overlay after animation
+            setTimeout(() => {
+                overlay.remove();
+            }, 300);
+            
+            // Book-specific effects
+            switch(bookName) {
+                case 'rhean':
+                    // Sword animation effect
+                    break;
+                case 'maneus':
+                    // Fragment animation effect
+                    break;
+                case 'besnowed':
+                    // Snow animation effect
+                    break;
+                case 'revification':
+                    // Glitch animation effect
+                    document.body.classList.add('glitch-active');
+                    setTimeout(() => {
+                        document.body.classList.remove('glitch-active');
+                    }, 1000);
+                    break;
+                case 'luxaeterna':
+                    // Light/dark contrast effect
+                    break;
+            }
+        }
+        
+        // Create particle system
+        function createParticles() {
+            const particleContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                
+                // Random color (from our color scheme)
+                const colors = ['rgba(106, 13, 173, 0.7)', 'rgba(57, 255, 20, 0.7)', 'rgba(212, 175, 55, 0.7)'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.backgroundColor = color;
+                
+                // Random animation duration
+                const duration = Math.random() * 20 + 10;
+                particle.style.animation = `float ${duration}s infinite ease-in-out`;
+                
+                // Random delay
+                const delay = Math.random() * 10;
+                particle.style.animationDelay = `${delay}s`;
+                
+                // Add to container
+                particle.style.position = 'absolute';
+                particle.style.borderRadius = '50%';
+                particleContainer.appendChild(particle);
+            }
+        }
+        
+        // Create floating text fragments
+        function createFloatingText() {
+            const container = document.getElementById('floating-text');
+            const textFragments = [
+                "memory fades but never truly disappears",
+                "between sacred and profane lies truth",
+                "the blade remembers what the mind forgets",
+                "fragments of lives scattered across time",
+                "in winter's embrace we find ourselves",
+                "reality is merely perception's shadow",
+                "the office hides divine rebellion",
+                "what does it mean to remember?",
+                "what does it mean to fight?",
+                "what does it mean to belong?",
+                "the final fantasy never ends"
+            ];
+            
+            textFragments.forEach((text, index) => {
+                const textElement = document.createElement('div');
+                textElement.classList.add('floating-text');
+                textElement.textContent = text;
+                
+                // Random position
+                const posX = Math.random() * 80 + 10;
+                const posY = Math.random() * 80 + 10;
+                textElement.style.left = `${posX}%`;
+                textElement.style.top = `${posY}%`;
+                
+                // Random animation duration and delay
+                const duration = Math.random() * 30 + 20;
+                const delay = Math.random() * 10;
+                textElement.style.animation = `float ${duration}s infinite ease-in-out`;
+                textElement.style.animationDelay = `${delay}s`;
+                
+                // Random opacity
+                const opacity = Math.random() * 0.3 + 0.1;
+                textElement.style.opacity = opacity;
+                
+                // Random rotation
+                const rotation = Math.random() * 20 - 10;
+                textElement.style.transform = `rotate(${rotation}deg)`;
+                
+                container.appendChild(textElement);
+            });
+        }
+        
+        // Setup audio control
+        function setupAudio() {
+            const audioControl = document.getElementById('audio-control');
+            const audioElement = document.getElementById('background-audio');
+            const audioIcon = document.getElementById('audio-icon');
+            let audioPlaying = false;
+            
+            audioControl.addEventListener('click', function() {
+                if (audioPlaying) {
+                    audioElement.pause();
+                    audioIcon.textContent = '♪';
+                    audioControl.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                } else {
+                    audioElement.play();
+                    audioIcon.textContent = '♫';
+                    audioControl.style.backgroundColor = 'rgba(57, 255, 20, 0.5)';
+                }
+                audioPlaying = !audioPlaying;
+            });
+        }
+        
+        // Setup mouse movement effects
+        function setupMouseEffects() {
+            const container = document.querySelector('.content-container');
+            
+            document.addEventListener('mousemove', function(e) {
+                // Calculate mouse position as percentage of window
+                const mouseX = e.clientX / window.innerWidth;
+                const mouseY = e.clientY / window.innerHeight;
+                
+                // Subtle parallax effect on background
+                const backgroundPattern = document.querySelector('.background-pattern');
+                backgroundPattern.style.transform = `translate(${mouseX * 10}px, ${mouseY * 10}px)`;
+                
+                // Affect particles based on mouse position
+                const particles = document.querySelectorAll('.particle');
+                particles.forEach(particle => {
+                    const randomFactor = Math.random() * 20 - 10;
+                    particle.style.transform = `translate(${mouseX * randomFactor}px, ${mouseY * randomFactor}px)`;
+                });
+                
+                // Subtle effect on author name
+                const authorName = document.querySelector('.author-name');
+                authorName.style.textShadow = `${4 + mouseX * 4}px ${4 + mouseY * 4}px 0px var(--primary-color)`;
+            });
+        }
+    </script>
+</body>
+</html>
